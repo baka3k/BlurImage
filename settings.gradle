@@ -1,0 +1,3 @@
+rootProject.name = "BlurExample"
+include ':app'
+include ':BlurImage'
