@@ -27,7 +27,7 @@ Good luck !!!
 Add the dependency
 ```groovy
 dependencies {
-    implementation "com.baka3k.blur:1.0"
+    implementation "com.github.baka3k:BlurImage:1.0.0"
 }
 ```
 ## Usage
