@@ -29,10 +29,10 @@ build.gradle:
 allprojects {
     repositories {
         .....
-        maven { url 'https://jitpack.io' } // add this line to 
+        maven { url 'https://jitpack.io' } // add this line to build.gradle
     }
 }
-```groovy
+```
 Add the dependency
 ```groovy
 dependencies {
