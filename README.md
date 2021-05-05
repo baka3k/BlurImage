@@ -1,5 +1,5 @@
 # Blur Photo
-To make your imageview blurry in a single line of code, \
+To make your imageview blurry on Android,
 library using rendersript which is most efficient for doing these tasks and provide best performance 
 
 Good luck !!!
@@ -47,7 +47,7 @@ BlurImage(applicationContext).radius(18F).load(rootView).into(imageView)
 
 ## Sample
 
-![Output sample](https://github.com/baka3k/RecorderIJKPlayerSample/blob/master/sample.gif)
+![Output sample](https://github.com/baka3k/BlurImage/blob/main/sample.gif)
 
 refer sample in below package
 ```Java
