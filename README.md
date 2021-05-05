@@ -24,6 +24,15 @@ Good luck !!!
 
 
 ## Gradle
+build.gradle:
+```groovy
+allprojects {
+    repositories {
+        .....
+        maven { url 'https://jitpack.io' } // add this line to 
+    }
+}
+```groovy
 Add the dependency
 ```groovy
 dependencies {
