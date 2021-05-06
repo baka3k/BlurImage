@@ -2,8 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:id="@+id/rootView"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
@@ -14,30 +14,28 @@
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBlurImage"
-        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintTop_toBottomOf="@+id/btnBlurImageByRenderScript"
+        app:layout_constraintVertical_bias="0.909"
         tools:srcCompat="@tools:sample/avatars" />
 
     <Button
-        android:id="@+id/btnBlurImage"
-        android:layout_width="wrap_content"
+        android:id="@+id/btnBlurImageByRenderScript"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:text="Blur photo"
+        android:text="Blur photo by RenderScript"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btnBlurScreen"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBlurByCPU" />
 
     <Button
         android:id="@+id/btnLoadImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Load photo"
-        app:layout_constraintEnd_toStartOf="@+id/btnBlurScreen"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/btnBlurScreen"
@@ -45,7 +43,15 @@
         android:layout_height="wrap_content"
         android:text="Blur Screen"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnBlurByCPU"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Blur Photo By CPU"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/btnLoadImage" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

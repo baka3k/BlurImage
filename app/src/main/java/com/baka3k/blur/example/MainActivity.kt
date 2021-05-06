@@ -10,12 +10,7 @@ import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
 import com.baka3k.blur.BlurImage
-import com.baka3k.blur.ImageUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -27,27 +22,31 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rootView: View
     private lateinit var imageView: ImageView
     private lateinit var btnBlurScreen: Button
-    private lateinit var btnBlurPhoto: Button
+    private lateinit var btnBlurPhotoByRenderScript: Button
+    private lateinit var btnBlurPhotoByCPU: Button
     private lateinit var btnLoadPhoto: Button
     private val onClickListener: View.OnClickListener = View.OnClickListener {
-        if (it.id == btnBlurPhoto.id) {
-            lifecycleScope.launch {
-//                BlurImage(applicationContext).radius(11F).load(IMAGE_PATH).into(imageView)
-                BlurImage(applicationContext).radius(18F).load(R.raw.a).into(imageView)
-            }
-        }
-        if (it.id == btnBlurScreen.id) {
-            lifecycleScope.launch {
-                BlurImage(applicationContext).radius(18f).load(rootView).into(imageView)
-            }
+
+        if (it.id == btnBlurPhotoByRenderScript.id) {
+            BlurImage.getInstance(applicationContext).load(R.raw.a)
+                .radius(22F)
+                .withRenderScript()
+                .into(imageView)
+        } else if (it.id == btnBlurPhotoByCPU.id) {
+            BlurImage.getInstance(applicationContext).load(R.raw.a)
+                .radius(18f)
+                .withCPU()
+                .into(imageView)
+        } else if (it.id == btnBlurScreen.id) {
+            BlurImage.getInstance(applicationContext).load(rootView)
+                .radius(20f)
+                .withRenderScript()
+                .into(imageView)
         } else {
-            lifecycleScope.launch {
-                val bitmap = withContext(Dispatchers.IO) {
-                    BitmapFactory.decodeResource(resources, R.raw.a)
-                }
-                imageView.setImageBitmap(bitmap)
-            }
+            val bitmap = BitmapFactory.decodeResource(resources, R.raw.a)
+            imageView.setImageBitmap(bitmap)
         }
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,25 +54,27 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         rootView = findViewById(R.id.rootView)
         btnBlurScreen = findViewById(R.id.btnBlurScreen)
-        btnBlurPhoto = findViewById(R.id.btnBlurImage)
+        btnBlurPhotoByCPU = findViewById(R.id.btnBlurByCPU)
+        btnBlurPhotoByRenderScript = findViewById(R.id.btnBlurImageByRenderScript)
         btnLoadPhoto = findViewById(R.id.btnLoadImage)
         imageView = findViewById(R.id.imageView)
 
-        btnBlurPhoto.setOnClickListener(onClickListener)
+        btnBlurPhotoByCPU.setOnClickListener(onClickListener)
+        btnBlurPhotoByRenderScript.setOnClickListener(onClickListener)
         btnLoadPhoto.setOnClickListener(onClickListener)
         btnBlurScreen.setOnClickListener(onClickListener)
     }
 
     private fun hasPermission(): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return PERMISSIONS_REQUIRED.all {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PERMISSIONS_REQUIRED.all {
                 ContextCompat.checkSelfPermission(
                     applicationContext,
                     it
                 ) == PackageManager.PERMISSION_GRANTED
             }
         } else {
-            return true
+            true
         }
     }
 

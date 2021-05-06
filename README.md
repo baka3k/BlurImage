@@ -22,7 +22,6 @@ Good luck !!!
 
 - Android 5.1+
 
-
 ## Gradle
 build.gradle:
 ```groovy

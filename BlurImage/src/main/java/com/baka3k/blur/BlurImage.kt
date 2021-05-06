@@ -1,31 +1,43 @@
 package com.baka3k.blur
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.renderscript.RenderScript
 import android.view.View
 import android.widget.ImageView
+import com.baka3k.blur.process.Executor
+import com.baka3k.blur.process.KotlinBlurProcess
 import com.baka3k.blur.process.RenderScriptProcess
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import java.util.concurrent.Callable
 
-class BlurImage(private val context: Context) {
+
+class BlurImage private constructor(private val context: Context) {
     companion object {
         private const val MAX_RADIUS = 25F
         private const val MIN_RADIUS = 0F
+
+        @Volatile
+        private var INSTANCE: BlurImage? = null
+
+        fun getInstance(context: Context): BlurImage {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: BlurImage(context.applicationContext).also { INSTANCE = it }
+            }
+        }
     }
 
-    private val blurProcess: BlurProcess
+    private var blurProcess: BlurProcess = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        RenderScriptProcess(RenderScript.create(context.applicationContext))
+    } else {
+        KotlinBlurProcess()
+    }
 
     private var radius = 10F // default
     private var source: Bitmap? = null
-
-    init {
-        blurProcess = RenderScriptProcess(
-            RenderScript.create(context.applicationContext)
-        )
-    }
+    private var decodePhotoTask: Callable<Bitmap>? = null
 
     /**
      * radius from 1 to 25
@@ -39,42 +51,95 @@ class BlurImage(private val context: Context) {
         return this
     }
 
-    suspend fun load(bitmap: Bitmap): BlurImage {
+    fun withRenderScript(): BlurImage {
+        blurProcess = RenderScriptProcess(RenderScript.create(context.applicationContext))
+        return this
+    }
+
+    fun withCPU(): BlurImage {
+        blurProcess = KotlinBlurProcess()
+        return this
+    }
+
+    fun load(bitmap: Bitmap): BlurImage {
         source = bitmap
         return this
     }
 
-    suspend fun load(resource: Int): BlurImage = withContext(Dispatchers.IO) {
-        source = BitmapFactory.decodeResource(context.resources, resource)
-        this@BlurImage
+    fun load(resource: Int): BlurImage {
+        decodePhotoTask = DecodePhotoFromResourceTask(context.resources, resourceId = resource)
+        return this
     }
 
-    suspend fun load(pathFile: String): BlurImage = withContext(Dispatchers.IO) {
+    fun load(pathFile: String): BlurImage {
         val bmOptions = BitmapFactory.Options()
-        source = BitmapFactory.decodeFile(pathFile, bmOptions)
-        this@BlurImage
+        decodePhotoTask = DecodePhotoFromFileTask(pathFile, bmOptions)
+        return this
     }
 
-    suspend fun load(pathFile: String, bmOptions: BitmapFactory.Options): BlurImage =
-        withContext(Dispatchers.IO) {
-            source = BitmapFactory.decodeFile(pathFile, bmOptions)
-            this@BlurImage
-        }
-
-    suspend fun load(view: View): BlurImage = withContext(Dispatchers.IO) {
-        source = ImageUtils.getScreenshot(view)
-        this@BlurImage
+    fun load(pathFile: String, bmOptions: BitmapFactory.Options): BlurImage {
+        decodePhotoTask = DecodePhotoFromFileTask(pathFile, bmOptions)
+        return this
     }
 
-    private suspend fun blur(): Bitmap? = withContext(Dispatchers.IO) {
-        if (source == null) {
+    fun load(view: View): BlurImage {
+        decodePhotoTask = DecodePhotoFromView(view)
+        return this
+    }
+
+    private fun blur(): Bitmap? {
+        return if (source == null) {
             null
         } else {
             blurProcess.blur(source!!, radius)
         }
     }
 
-    suspend fun into(imageView: ImageView) = withContext(Dispatchers.Main) {
-        imageView.setImageBitmap(blur())
+    fun into(imageView: ImageView) {
+        Executor.io {
+            if (decodePhotoTask != null) {
+                source = decodePhotoTask?.call()
+            }
+            decodePhotoTask = null
+            if (source != null && !source!!.isRecycled) {
+                val blurBitmap = blur()
+                if (blurBitmap != null) {
+                    Executor.ui {
+                        imageView.setImageBitmap(blurBitmap)
+                    }
+                }
+                source?.recycle()
+                source = null
+            }
+        }
+    }
+
+    private inner class DecodePhotoFromResourceTask(
+        private val resource: Resources,
+        private val resourceId: Int
+    ) :
+        Callable<Bitmap> {
+        override fun call(): Bitmap {
+            return BitmapFactory.decodeResource(resource, resourceId)
+        }
+    }
+
+    private inner class DecodePhotoFromFileTask(
+        private val pathFile: String,
+        private val bmOptions: BitmapFactory.Options
+    ) :
+        Callable<Bitmap> {
+        override fun call(): Bitmap {
+            return BitmapFactory.decodeFile(pathFile, bmOptions)
+        }
+    }
+
+    private inner class DecodePhotoFromView(
+        private val view: View
+    ) :
+        Callable<Bitmap> {
+        override fun call(): Bitmap {
+            return ImageUtils.getScreenshot(view)
+        }
     }
 }
