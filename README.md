@@ -35,7 +35,7 @@ allprojects {
 Add the dependency
 ```groovy
 dependencies {
-    implementation "com.github.baka3k:BlurImage:1.0.0"
+    implementation "com.github.baka3k:BlurImage:1.0.1"
 }
 ```
 ## Usage
