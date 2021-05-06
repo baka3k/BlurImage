@@ -41,7 +41,10 @@ dependencies {
 ## Usage
 Load image from resource, and draw blur image to Imageview
 ```Kotlin
-BlurImage(applicationContext).radius(18F).load(R.raw.a).into(imageView)
+ BlurImage.getInstance(applicationContext).load(R.raw.a)
+                .radius(22F)
+                .withRenderScript() // or .withCPU()
+                .into(imageView)
 ```
 
 Capture Screen, blur then draw image to Imageview
@@ -50,7 +53,10 @@ private lateinit var rootView: View
 .....
 rootView = findViewById(R.id.rootView)
 .....
-BlurImage(applicationContext).radius(18F).load(rootView).into(imageView)
+ BlurImage.getInstance(applicationContext).load(rootView)
+                .radius(20f)
+                .withRenderScript()
+                .into(imageView)
 ```
 
 ## Sample
