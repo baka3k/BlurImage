@@ -1,6 +1,7 @@
 # Blur Photo
 To make your imageview blurry on Android,
-library using rendersript which is most efficient for doing these tasks and provide best performance 
+Library using rendersript which is most efficient for doing these tasks and provide best performance. 
+(Optional by using CPU to blur task)
 
 Good luck !!!
 
@@ -17,6 +18,7 @@ Good luck !!!
 
 - [x] Blur photo from resource, or file
 - [x] Blur view
+- [x] Optional Blur by using CPU or Render Script
 
 ## Requirements
 
