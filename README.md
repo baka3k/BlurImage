@@ -74,4 +74,4 @@ com.baka3k.blur.example.MainActivity
 baka3k@gmail.com
 
 ## License
-Apache licensed
+MIT licensed
