@@ -41,7 +41,8 @@ dependencies {
 ## Usage
 Load image from resource, and draw blur image to Imageview
 ```Kotlin
- BlurImage.getInstance(applicationContext).load(R.raw.a)
+ BlurImage.getInstance(applicationContext)
+                .load(R.raw.a) //from resource or image path from storage
                 .radius(22F)
                 .withRenderScript() // or .withCPU()
                 .into(imageView)
